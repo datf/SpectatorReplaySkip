@@ -30,14 +30,17 @@ jobs:
         path: plugin\bakkesmodsdk
 
     - name: Add MSBuild to PATH
-      uses: microsoft/setup-msbuild@v1.0.2
+      uses: microsoft/setup-msbuild@v1.1
+      with:
+        msbuild-architecture: x64
 
     - name: Build
-      run: msbuild /m /p:Configuration=Release /p:BakkesModPath=$env:GITHUB_WORKSPACE\plugin /p:Environment=GitHub $env:GITHUB_WORKSPACE\plugin\${{ env.SOLUTION_NAME }}.sln
+      working-directory: ${{ github.workspace }}
+      run: msbuild /m /p:Configuration=Release /p:BakkesModPath=plugin /p:Environment=GitHub plugin\${{ env.SOLUTION_NAME }}.sln
 
     - name: Create Release
       uses: softprops/action-gh-release@v1
+      working-directory: ${{ github.workspace }}
       with:
-        files: ${{ github.workspace }}\plugin\plugins\${{ env.SOLUTION_NAME }}.dll
-      env:
-        GITHUB_TOKEN: ${{ env.GITHUB_TOKEN }}
+        fail_on_unmatched_files: true
+        files: plugin/plugins/${{ env.SOLUTION_NAME }}.dll
